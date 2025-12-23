@@ -10,10 +10,13 @@ require_auth_and_tenant()
 sidebar_common()
 
 st.title("⚙️ Configurações da Loja")
-st.caption("Aqui você define custos fixos e capacidade. (Por enquanto, salva só na sessão do navegador.)")
+st.caption("Aqui você define custos fixos e capacidade.")
 
 tenant_id = st.session_state["tenant_id"]
 
+# -------------------------
+# Carrega do Firestore (1x)
+# -------------------------
 if "store_params" not in st.session_state:
     db_store = load_store_params(tenant_id)
     if db_store:
@@ -23,36 +26,81 @@ if "fixed_costs" not in st.session_state:
     db_costs = load_fixed_costs(tenant_id)
     if db_costs:
         st.session_state["fixed_costs"] = db_costs
-        
+
+# -------------------------
 # Defaults
+# -------------------------
 store_defaults = {
     "num_salas": 1,
     "dias_mes": 26,
     "horas_dia": 10.0,
     "ocupacao_pct": 70.0,  # 0 a 100
+
+    # ✅ NOVOS percentuais (0 a 100)
+    "aliquota_imposto_pct": 0.0,
+    "taxa_cartao_pct": 0.0,
+    "comissao_pct": 0.0,
 }
+
 cost_defaults = {
     "aluguel": 0.0,
     "salarios": 0.0,
     "outros": 0.0,
 }
 
-store_params = st.session_state.get("store_params", store_defaults.copy())
-fixed_costs = st.session_state.get("fixed_costs", cost_defaults.copy())
+# Merge seguro: garante chaves novas mesmo para lojas antigas
+store_params = {**store_defaults, **st.session_state.get("store_params", {})}
+fixed_costs = {**cost_defaults, **st.session_state.get("fixed_costs", {})}
 
+# -------------------------
+# Form
+# -------------------------
 with st.form("config_form"):
     st.subheader("Capacidade")
     c1, c2, c3, c4 = st.columns(4)
-    store_params["num_salas"] = c1.number_input("Nº de salas", min_value=1, step=1, value=int(store_params["num_salas"]))
-    store_params["dias_mes"] = c2.number_input("Dias/mês", min_value=1, max_value=31, step=1, value=int(store_params["dias_mes"]))
-    store_params["horas_dia"] = c3.number_input("Horas/dia", min_value=1.0, max_value=24.0, step=0.5, value=float(store_params["horas_dia"]))
-    store_params["ocupacao_pct"] = c4.number_input("Ocupação média (%)", min_value=1.0, max_value=100.0, step=1.0, value=float(store_params["ocupacao_pct"]))
+    store_params["num_salas"] = c1.number_input(
+        "Nº de salas", min_value=1, step=1, value=int(store_params["num_salas"])
+    )
+    store_params["dias_mes"] = c2.number_input(
+        "Dias/mês", min_value=1, max_value=31, step=1, value=int(store_params["dias_mes"])
+    )
+    store_params["horas_dia"] = c3.number_input(
+        "Horas/dia", min_value=1.0, max_value=24.0, step=0.5, value=float(store_params["horas_dia"])
+    )
+    store_params["ocupacao_pct"] = c4.number_input(
+        "Ocupação média (%)", min_value=1.0, max_value=100.0, step=1.0, value=float(store_params["ocupacao_pct"])
+    )
 
     st.subheader("Custos fixos (mensal)")
     k1, k2, k3 = st.columns(3)
-    fixed_costs["aluguel"] = k1.number_input("Aluguel (R$)", min_value=0.0, step=100.0, value=float(fixed_costs["aluguel"]))
-    fixed_costs["salarios"] = k2.number_input("Salários (R$)", min_value=0.0, step=100.0, value=float(fixed_costs["salarios"]))
-    fixed_costs["outros"] = k3.number_input("Outros custos fixos (R$)", min_value=0.0, step=100.0, value=float(fixed_costs["outros"]))
+    fixed_costs["aluguel"] = k1.number_input(
+        "Aluguel (R$)", min_value=0.0, step=100.0, value=float(fixed_costs["aluguel"])
+    )
+    fixed_costs["salarios"] = k2.number_input(
+        "Salários (R$)", min_value=0.0, step=100.0, value=float(fixed_costs["salarios"])
+    )
+    fixed_costs["outros"] = k3.number_input(
+        "Outros custos fixos (R$)", min_value=0.0, step=100.0, value=float(fixed_costs["outros"])
+    )
+
+    # ✅ NOVO BLOCO
+    st.subheader("Percentuais sobre a receita")
+    p1, p2, p3 = st.columns(3)
+    store_params["aliquota_imposto_pct"] = p1.number_input(
+        "Alíquota de imposto (%)",
+        min_value=0.0, max_value=100.0, step=0.1,
+        value=float(store_params["aliquota_imposto_pct"])
+    )
+    store_params["taxa_cartao_pct"] = p2.number_input(
+        "% máquina/cartão",
+        min_value=0.0, max_value=100.0, step=0.1,
+        value=float(store_params["taxa_cartao_pct"])
+    )
+    store_params["comissao_pct"] = p3.number_input(
+        "% comissão",
+        min_value=0.0, max_value=100.0, step=0.1,
+        value=float(store_params["comissao_pct"])
+    )
 
     submitted = st.form_submit_button("Salvar configurações")
 
@@ -65,7 +113,9 @@ if submitted:
 
     st.success(f"Configurações salvas ✅ (loja: {tenant_id})")
 
+# -------------------------
 # KPIs (preview)
+# -------------------------
 if "store_params" in st.session_state and "fixed_costs" in st.session_state:
     sp = st.session_state["store_params"]
     fc = st.session_state["fixed_costs"]
@@ -94,5 +144,4 @@ if "store_params" in st.session_state and "fixed_costs" in st.session_state:
 
     st.caption(f"Custo/min (capacidade): R$ {custo_min_capacidade:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
 
-from services.ui import footer_signature
 footer_signature()
