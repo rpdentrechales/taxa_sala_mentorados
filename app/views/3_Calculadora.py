@@ -3,7 +3,7 @@ from services.guard import require_auth_and_tenant
 from services.ui import sidebar_common, footer_signature
 
 require_auth_and_tenant()
-sidebar_common()
+sidebar_common("calculator")
 
 st.title("🧮 Calculadora")
 st.caption("Calcula custo/minuto, custo do procedimento e mostra ociosidade.")
@@ -108,5 +108,3 @@ if preco_atual not in (None, ""):
 
 st.markdown("---")
 st.caption(f"Custo/min (capacidade): R$ {custo_min_capacidade:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
-
-footer_signature()

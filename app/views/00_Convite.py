@@ -1,7 +1,7 @@
 # app/pages/00_Convite.py
 import streamlit as st
 from services.guard import require_auth_only, accept_invite_for_current_user
-from services.ui import footer_signature
+from services.ui import sidebar_common, footer_signature
 
 st.title("🎟️ Ativar acesso")
 

@@ -5,7 +5,7 @@ from services.guard import require_auth_and_tenant
 from services.ui import sidebar_common, footer_signature
 
 require_auth_and_tenant()
-sidebar_common()
+sidebar_common("procedure")
 
 st.title("🧾 Procedimentos")
 st.caption("Cada loja cadastra seus próprios procedimentos.")
@@ -75,4 +75,3 @@ if col2.button("Limpar tudo"):
     save_procedures(tenant_id, [])
     st.warning(f"Procedimentos removidos (loja: {tenant_id})")
 
-footer_signature()

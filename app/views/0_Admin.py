@@ -1,6 +1,8 @@
 # app/pages/0_Admin.py
 import secrets
 from datetime import datetime, timedelta, timezone
+from services.ui import sidebar_common, footer_signature
+
 
 import streamlit as st
 
@@ -16,7 +18,7 @@ if st.query_params.get("invite"):
 
 # 1) Garante login (sem exigir tenant) — e sem criar conta aqui
 require_auth_only(allow_signup=False)
-sidebar_common()
+sidebar_common("admin")
 
 st.title("🛠️ Admin — Tenants & Convites")
 
@@ -206,4 +208,3 @@ for doc in docs:
 st.dataframe(rows, use_container_width=True)
 st.caption("Se você preencheu **email** no convite, ele só funciona para aquele email.")
 
-footer_signature()

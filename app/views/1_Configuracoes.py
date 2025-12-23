@@ -6,8 +6,9 @@ from services.tenant_repo import (
 from services.guard import require_auth_and_tenant
 from services.ui import sidebar_common, footer_signature
 
+
 require_auth_and_tenant()
-sidebar_common()
+sidebar_common("config")
 
 st.title("⚙️ Configurações da Loja")
 st.caption("Aqui você define custos fixos e capacidade.")
@@ -143,5 +144,3 @@ if "store_params" in st.session_state and "fixed_costs" in st.session_state:
     d.metric("Custo/min (real)", f"R$ {custo_min_real:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
 
     st.caption(f"Custo/min (capacidade): R$ {custo_min_capacidade:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
-
-footer_signature()
