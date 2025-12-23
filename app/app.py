@@ -64,7 +64,7 @@ if has_tenant:
     st.session_state["role"] = role
 
     pages += [
-        st.Page("views/10_App.py", title="App", icon="🧮", url_path="home"),
+        st.Page("views/10_last_version.py", title="App", icon="🧮", url_path="home"),
         st.Page("views/1_Configuracoes.py", title="Configurações", icon="⚙️", url_path="configuracoes"),
         st.Page("views/2_Procedimentos.py", title="Procedimentos", icon="🧾", url_path="procedimentos"),
         st.Page("views/3_Calculadora.py", title="Calculadora", icon="🧮", url_path="calculadora"),
