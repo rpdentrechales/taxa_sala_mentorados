@@ -1,53 +1,62 @@
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(override=True)
 
 import os
 import streamlit as st
 
-# ⚠️ PRIMEIRO st.*
-st.set_page_config(
-    page_title="Taxa de Sala 360",
-    page_icon="🧮",
-    layout="wide"
-)
-
-# Base URL para gerar link correto (Admin)
+st.set_page_config(page_title="Taxa de Sala 360", page_icon="🧮", layout="wide")
 st.session_state["base_url"] = os.environ.get("APP_BASE_URL", "http://localhost:8501").rstrip("/")
 
-# Se tiver invite, salva token e manda para a página única de convite
+# convite: só por link
 invite_token = st.query_params.get("invite")
 if invite_token:
     st.session_state["pending_invite"] = invite_token
     st.query_params.clear()
-    st.switch_page("pages/00_Convite.py")
+    st.switch_page("views/00_Convite.py")
 
-from services.guard import require_auth_and_tenant
-from services.ui import sidebar_common
+from services.guard import require_auth_only, reset_tenant_scoped_state_if_needed
+from services.user_tenant_repo import get_user_tenant
+from services.permissions import is_admin_email
 
-# Garante login + tenant (criar conta não aparece aqui)
-require_auth_and_tenant()
-sidebar_common()
+# ====== MENU DINÂMICO ======
+pages = []
 
-# ---------- HOME ----------
-st.title("🧮 Taxa de Sala 360")
-st.caption("MVP (Firestore + login + convites).")
+# não logado: mostra só "Login" (uma view simples)
+# (aqui a gente só chama require_auth_only e ele já mostra a tela de login)
+require_auth_only(allow_signup=False)
 
-has_config = "store_params" in st.session_state and "fixed_costs" in st.session_state
-has_procs = "procedures" in st.session_state and len(st.session_state.get("procedures", [])) > 0
+# se chegou aqui, está logado
+uid = st.session_state["uid"]
+email = st.session_state.get("email", "")
 
-col1, col2, col3 = st.columns(3)
-col1.metric("Configurações", "OK" if has_config else "Pendente")
-col2.metric("Procedimentos", "OK" if has_procs else "Pendente")
-col3.metric("Pronto p/ calcular", "SIM" if (has_config and has_procs) else "NÃO")
+mapping = get_user_tenant(uid)
+has_tenant = bool(mapping)
 
-st.markdown("---")
-st.subheader("Como usar")
-st.write(
-    """
-1) Vá em **Configurações** e preencha custos fixos + capacidade (salas, dias, horas, ocupação).
-2) Vá em **Procedimentos** e cadastre os procedimentos da loja.
-3) Vá em **Calculadora** e selecione um procedimento para ver os custos e KPIs (incluindo ociosidade).
-"""
-)
+if has_tenant:
+    tenant_id = mapping["tenant_id"]
+    st.session_state["tenant_id"] = tenant_id
+    reset_tenant_scoped_state_if_needed(tenant_id)
 
-st.info("Agora navegue pelas páginas no menu lateral 👈")
+    role = mapping.get("role", "user")
+    if is_admin_email(email):
+        role = "admin"
+    st.session_state["role"] = role
+
+    pages += [
+        st.Page("views/10_App.py", title="App", icon="🧮", url_path="home"),
+        st.Page("views/1_Configuracoes.py", title="Configurações", icon="⚙️", url_path="configuracoes"),
+        st.Page("views/2_Procedimentos.py", title="Procedimentos", icon="🧾", url_path="procedimentos"),
+        st.Page("views/3_Calculadora.py", title="Calculadora", icon="🧮", url_path="calculadora"),
+    ]
+else:
+    # sem tenant: só admin pode ver admin
+    if st.session_state.get("role") != "admin":
+        st.error("Seu usuário ainda não está vinculado a uma loja (tenant).")
+        st.info("Use o link de convite enviado pelo administrador.")
+        st.stop()
+
+# admin no menu só pra admin
+if st.session_state.get("role") == "admin":
+    pages += [st.Page("views/0_Admin.py", title="Admin", icon="🛠️", url_path="admin")]
+
+st.navigation(pages).run()

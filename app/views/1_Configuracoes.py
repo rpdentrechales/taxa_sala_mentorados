@@ -3,6 +3,11 @@ from services.tenant_repo import (
     load_store_params, save_store_params,
     load_fixed_costs, save_fixed_costs
 )
+from services.guard import require_auth_and_tenant
+from services.ui import sidebar_common, footer_signature
+
+require_auth_and_tenant()
+sidebar_common()
 
 st.title("⚙️ Configurações da Loja")
 st.caption("Aqui você define custos fixos e capacidade. (Por enquanto, salva só na sessão do navegador.)")

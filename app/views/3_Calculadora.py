@@ -1,4 +1,9 @@
 import streamlit as st
+from services.guard import require_auth_and_tenant
+from services.ui import sidebar_common, footer_signature
+
+require_auth_and_tenant()
+sidebar_common()
 
 st.title("🧮 Calculadora")
 st.caption("Calcula custo/minuto, custo do procedimento e mostra ociosidade. (MVP: dados da sessão)")

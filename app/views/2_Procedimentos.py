@@ -1,6 +1,11 @@
 import streamlit as st
 import pandas as pd
 from services.tenant_repo import load_procedures, save_procedures
+from services.guard import require_auth_and_tenant
+from services.ui import sidebar_common, footer_signature
+
+require_auth_and_tenant()
+sidebar_common()
 
 st.title("🧾 Procedimentos")
 st.caption("Cada loja cadastra seus próprios procedimentos. (MVP: salva só na sessão)")
