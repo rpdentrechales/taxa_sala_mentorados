@@ -4,3 +4,4 @@ google-cloud-firestore>=2.16
 firebase-admin>=6.5
 pydantic>=2.7
 requests>=2.31
+google-auth
