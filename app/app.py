@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 import streamlit as st
 
 st.set_page_config(
@@ -5,6 +8,12 @@ st.set_page_config(
     page_icon="🧮",
     layout="wide"
 )
+
+
+st.sidebar.header("🔧 Modo DEV")
+tenant_id = st.sidebar.text_input("Tenant (loja)", value=st.session_state.get("tenant_id", "loja_demo")).strip()
+st.session_state["tenant_id"] = tenant_id
+st.sidebar.caption("Troque o tenant para simular outra loja.")
 
 st.title("🧮 Taxa de Sala 360")
 st.caption("MVP local (sem banco): dados ficam apenas durante a sessão do navegador.")

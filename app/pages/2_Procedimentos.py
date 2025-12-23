@@ -1,11 +1,16 @@
 import streamlit as st
 import pandas as pd
+from services.tenant_repo import load_procedures, save_procedures
 
 st.title("🧾 Procedimentos")
 st.caption("Cada loja cadastra seus próprios procedimentos. (MVP: salva só na sessão)")
 
-if "procedures" not in st.session_state:
-    st.session_state["procedures"] = []
+tenant_id = st.session_state.get("tenant_id", "loja_demo")
+
+if "procedures_loaded" not in st.session_state or st.session_state.get("procedures_loaded_for") != tenant_id:
+    st.session_state["procedures"] = load_procedures(tenant_id)
+    st.session_state["procedures_loaded"] = True
+    st.session_state["procedures_loaded_for"] = tenant_id
 
 # transforma lista em DataFrame editável
 df = pd.DataFrame(st.session_state["procedures"])
@@ -27,11 +32,13 @@ edited = st.data_editor(
 
 col1, col2 = st.columns(2)
 if col1.button("Salvar tabela"):
-    # limpa linhas vazias
     edited = edited.dropna(subset=["nome", "tempo_min", "insumos"], how="any")
-    st.session_state["procedures"] = edited.to_dict(orient="records")
-    st.success("Procedimentos salvos na sessão ✅")
+    items = edited.to_dict(orient="records")
+    st.session_state["procedures"] = items
+    save_procedures(tenant_id, items)
+    st.success(f"Procedimentos salvos ✅ (loja: {tenant_id})")
 
 if col2.button("Limpar tudo"):
     st.session_state["procedures"] = []
-    st.warning("Procedimentos removidos da sessão.")
+    save_procedures(tenant_id, [])
+    st.warning(f"Procedimentos removidos (loja: {tenant_id})")

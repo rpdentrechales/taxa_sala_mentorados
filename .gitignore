@@ -44,3 +44,5 @@ htmlcov/
 # ==== IDEs ====
 .vscode/
 .idea/
+
+secrets/

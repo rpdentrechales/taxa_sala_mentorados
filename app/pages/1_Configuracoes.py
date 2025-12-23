@@ -1,7 +1,21 @@
 import streamlit as st
+from services.tenant_repo import (
+    load_store_params, save_store_params,
+    load_fixed_costs, save_fixed_costs
+)
 
 st.title("⚙️ Configurações da Loja")
 st.caption("Aqui você define custos fixos e capacidade. (Por enquanto, salva só na sessão do navegador.)")
+
+tenant_id = st.session_state.get("tenant_id", "loja_demo")
+
+db_store = load_store_params(tenant_id)
+db_costs = load_fixed_costs(tenant_id)
+
+if db_store:
+    st.session_state["store_params"] = db_store
+if db_costs:
+    st.session_state["fixed_costs"] = db_costs
 
 # Defaults
 store_defaults = {
@@ -38,7 +52,11 @@ with st.form("config_form"):
 if submitted:
     st.session_state["store_params"] = store_params
     st.session_state["fixed_costs"] = fixed_costs
-    st.success("Configurações salvas na sessão ✅")
+
+    save_store_params(tenant_id, store_params)
+    save_fixed_costs(tenant_id, fixed_costs)
+
+    st.success(f"Configurações salvas ✅ (loja: {tenant_id})")
 
 # KPIs (preview)
 if "store_params" in st.session_state and "fixed_costs" in st.session_state:
