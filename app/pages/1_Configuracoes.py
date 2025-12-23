@@ -7,16 +7,18 @@ from services.tenant_repo import (
 st.title("⚙️ Configurações da Loja")
 st.caption("Aqui você define custos fixos e capacidade. (Por enquanto, salva só na sessão do navegador.)")
 
-tenant_id = st.session_state.get("tenant_id", "loja_demo")
+tenant_id = st.session_state["tenant_id"]
 
-db_store = load_store_params(tenant_id)
-db_costs = load_fixed_costs(tenant_id)
+if "store_params" not in st.session_state:
+    db_store = load_store_params(tenant_id)
+    if db_store:
+        st.session_state["store_params"] = db_store
 
-if db_store:
-    st.session_state["store_params"] = db_store
-if db_costs:
-    st.session_state["fixed_costs"] = db_costs
-
+if "fixed_costs" not in st.session_state:
+    db_costs = load_fixed_costs(tenant_id)
+    if db_costs:
+        st.session_state["fixed_costs"] = db_costs
+        
 # Defaults
 store_defaults = {
     "num_salas": 1,
@@ -86,3 +88,6 @@ if "store_params" in st.session_state and "fixed_costs" in st.session_state:
     d.metric("Custo/min (real)", f"R$ {custo_min_real:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
 
     st.caption(f"Custo/min (capacidade): R$ {custo_min_capacidade:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
+
+from services.ui import footer_signature
+footer_signature()

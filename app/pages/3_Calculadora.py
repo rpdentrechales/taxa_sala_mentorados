@@ -65,3 +65,6 @@ if preco_atual not in (None, ""):
 
 st.markdown("---")
 st.caption(f"Custo/min (capacidade): R$ {custo_min_capacidade:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
+
+from services.ui import footer_signature
+footer_signature()

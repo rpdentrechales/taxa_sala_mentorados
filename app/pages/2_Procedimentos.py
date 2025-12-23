@@ -5,9 +5,10 @@ from services.tenant_repo import load_procedures, save_procedures
 st.title("🧾 Procedimentos")
 st.caption("Cada loja cadastra seus próprios procedimentos. (MVP: salva só na sessão)")
 
-tenant_id = st.session_state.get("tenant_id", "loja_demo")
+tenant_id = st.session_state["tenant_id"]
 
-if "procedures_loaded" not in st.session_state or st.session_state.get("procedures_loaded_for") != tenant_id:
+if "procedures" not in st.session_state:
+    st.session_state["procedures"] = load_procedures(tenant_id)
     st.session_state["procedures"] = load_procedures(tenant_id)
     st.session_state["procedures_loaded"] = True
     st.session_state["procedures_loaded_for"] = tenant_id
@@ -42,3 +43,6 @@ if col2.button("Limpar tudo"):
     st.session_state["procedures"] = []
     save_procedures(tenant_id, [])
     st.warning(f"Procedimentos removidos (loja: {tenant_id})")
+
+from services.ui import footer_signature
+footer_signature()

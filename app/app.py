@@ -1,26 +1,39 @@
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(override=True)
 
+import os
 import streamlit as st
 
+# ⚠️ PRIMEIRO st.*
 st.set_page_config(
     page_title="Taxa de Sala 360",
     page_icon="🧮",
     layout="wide"
 )
 
+# Base URL para gerar link correto (Admin)
+st.session_state["base_url"] = os.environ.get("APP_BASE_URL", "http://localhost:8501").rstrip("/")
 
-st.sidebar.header("🔧 Modo DEV")
-tenant_id = st.sidebar.text_input("Tenant (loja)", value=st.session_state.get("tenant_id", "loja_demo")).strip()
-st.session_state["tenant_id"] = tenant_id
-st.sidebar.caption("Troque o tenant para simular outra loja.")
+# Se tiver invite, salva token e manda para a página única de convite
+invite_token = st.query_params.get("invite")
+if invite_token:
+    st.session_state["pending_invite"] = invite_token
+    st.query_params.clear()
+    st.switch_page("pages/00_Convite.py")
 
+from services.guard import require_auth_and_tenant
+from services.ui import sidebar_common
+
+# Garante login + tenant (criar conta não aparece aqui)
+require_auth_and_tenant()
+sidebar_common()
+
+# ---------- HOME ----------
 st.title("🧮 Taxa de Sala 360")
-st.caption("MVP local (sem banco): dados ficam apenas durante a sessão do navegador.")
+st.caption("MVP (Firestore + login + convites).")
 
-# Status rápido do que já foi preenchido
 has_config = "store_params" in st.session_state and "fixed_costs" in st.session_state
-has_procs = "procedures" in st.session_state and len(st.session_state["procedures"]) > 0
+has_procs = "procedures" in st.session_state and len(st.session_state.get("procedures", [])) > 0
 
 col1, col2, col3 = st.columns(3)
 col1.metric("Configurações", "OK" if has_config else "Pendente")
