@@ -166,5 +166,4 @@ def accept_invite_for_current_user(invite_token: str):
     # limpa e volta
     st.session_state.pop("pending_invite", None)
     st.query_params.clear()
-    st.success("Acesso ativado ✅")
-    st.switch_page("app.py")
+    return True

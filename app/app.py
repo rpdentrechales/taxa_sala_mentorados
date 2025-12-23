@@ -7,25 +7,46 @@ import streamlit as st
 st.set_page_config(page_title="Taxa de Sala 360", page_icon="🧮", layout="wide")
 st.session_state["base_url"] = os.environ.get("APP_BASE_URL", "http://localhost:8501").rstrip("/")
 
-# convite: só por link
-invite_token = st.query_params.get("invite")
-if invite_token:
-    st.session_state["pending_invite"] = invite_token
-    st.query_params.clear()
-    st.switch_page("views/00_Convite.py")
-
-from services.guard import require_auth_only, reset_tenant_scoped_state_if_needed
+from services.guard import (
+    require_auth_only,
+    reset_tenant_scoped_state_if_needed,
+    accept_invite_for_current_user,  # ✅ sem redirect agora
+)
 from services.user_tenant_repo import get_user_tenant
 from services.permissions import is_admin_email
 
-# ====== MENU DINÂMICO ======
+# ==========================
+# Convite: só via link ?invite=
+# (não usa switch_page, porque switch_page só aceita main ou pages/)
+# ==========================
+invite_token = st.query_params.get("invite") or st.session_state.get("pending_invite")
+
+if invite_token:
+    st.session_state["pending_invite"] = invite_token
+
+    st.title("🎟️ Ativar acesso")
+    st.caption("Entre ou crie sua conta para ativar o acesso à sua loja.")
+
+    # ✅ aqui sim: permite criar conta (só no fluxo do convite)
+    require_auth_only(allow_signup=True)
+
+    # consome o convite e vincula ao tenant (retorna True quando ok)
+    ok = accept_invite_for_current_user(invite_token)
+
+    if ok:
+        st.success("Acesso ativado ✅")
+        st.rerun()
+
+    st.stop()
+
+# ==========================
+# Fluxo normal (sem invite)
+# ==========================
 pages = []
 
-# não logado: mostra só "Login" (uma view simples)
-# (aqui a gente só chama require_auth_only e ele já mostra a tela de login)
+# Login sem criar conta
 require_auth_only(allow_signup=False)
 
-# se chegou aqui, está logado
 uid = st.session_state["uid"]
 email = st.session_state.get("email", "")
 
