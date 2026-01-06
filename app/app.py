@@ -29,7 +29,6 @@ if invite_token:
     st.title("🎟️ Ativar acesso")
     st.caption("Entre ou crie sua conta para ativar o acesso à sua loja.")
 
-    # ✅ aqui sim: permite criar conta (só no fluxo do convite)
     require_auth_only(allow_signup=True)
 
     # consome o convite e vincula ao tenant (retorna True quando ok)

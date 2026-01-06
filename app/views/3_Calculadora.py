@@ -43,12 +43,16 @@ custo_min_capacidade = (custo_fixo_total / min_disponiveis) if min_disponiveis >
 custo_min_real = (custo_fixo_total / min_utilizados) if min_utilizados > 0 else 0.0
 custo_ociosidade_mes = custo_fixo_total * (ociosidade_pct / 100.0)
 
+# ✅ NOVO: Taxa sala / hora (baseada no custo/min real)
+taxa_sala_hora = custo_min_real * 60.0
+
 # ---------- KPIs topo ----------
-k1, k2, k3, k4 = st.columns(4)
+k1, k2, k3, k4, k5 = st.columns(5)
 k1.metric("Ociosidade (%)", f"{ociosidade_pct:.1f}%")
 k2.metric("Minutos ociosos/mês", f"{min_ociosos:,.0f}".replace(",", "."))
 k3.metric("R$ ociosidade/mês", f"R$ {custo_ociosidade_mes:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
 k4.metric("Custo/min (real)", f"R$ {custo_min_real:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
+k5.metric("Taxa sala / hora", f"R$ {taxa_sala_hora:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
 
 st.markdown("---")
 
@@ -59,7 +63,7 @@ idx = st.selectbox("Selecione o procedimento", range(len(names)), format_func=la
 p = procedures[idx]
 tempo_min = float(p.get("tempo_min", 0) or 0)
 insumos = float(p.get("insumos", 0) or 0)
-mod = float(p.get("mod", 0) or 0)  # ✅ NOVO
+mod = float(p.get("mod", 0) or 0)
 preco_atual = p.get("preco_atual", None)
 
 # ---------- Custos ----------
@@ -95,16 +99,20 @@ if preco_atual not in (None, ""):
         margem_liquida_pct = (lucro_liquido / preco) * 100.0 if preco > 0 else 0.0
 
         st.markdown("---")
-        s1, s2, s3, s4 = st.columns(4)
-        s1.metric("Preço (bruto)", f"R$ {preco:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
-        s2.metric("Taxas (imposto+cartão+comissão)", f"R$ {taxas_valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
-        s3.metric("Receita líquida", f"R$ {receita_liquida:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
-        s4.metric("Lucro líquido", f"R$ {lucro_liquido:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
 
-        st.caption(f"Margem bruta (sem taxas): {margem_bruta_pct:.1f}% | Margem líquida (com taxas): {margem_liquida_pct:.1f}%")
+        # ✅ AGORA COMO MÉTRICAS
+        m1, m2, m3, m4, m5, m6 = st.columns(6)
+        m1.metric("Preço (bruto)", f"R$ {preco:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
+        m2.metric("Taxas (R$)", f"R$ {taxas_valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
+        m3.metric("Receita líquida", f"R$ {receita_liquida:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
+        m4.metric("Lucro líquido", f"R$ {lucro_liquido:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
+        m5.metric("Margem bruta", f"{margem_bruta_pct:.1f}%")
+        m6.metric("Margem líquida", f"{margem_liquida_pct:.1f}%")
 
     except ValueError:
         st.warning("Preço atual inválido para cálculo. Corrija no cadastro de Procedimentos.")
 
 st.markdown("---")
 st.caption(f"Custo/min (capacidade): R$ {custo_min_capacidade:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
+
+footer_signature()
