@@ -100,14 +100,32 @@ if preco_atual not in (None, ""):
 
         st.markdown("---")
 
-        # ✅ AGORA COMO MÉTRICAS
-        m1, m2, m3, m4, m5, m6 = st.columns(6)
-        m1.metric("Preço (bruto)", f"R$ {preco:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
-        m2.metric("Taxas (R$)", f"R$ {taxas_valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
-        m3.metric("Receita líquida", f"R$ {receita_liquida:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
-        m4.metric("Lucro líquido", f"R$ {lucro_liquido:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
-        m5.metric("Margem bruta", f"{margem_bruta_pct:.1f}%")
-        m6.metric("Margem líquida", f"{margem_liquida_pct:.1f}%")
+        # Linha 1: números financeiros
+        f1, f2, f3, f4 = st.columns(4)
+        f1.metric("Preço (bruto)", f"R$ {preco:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
+        f2.metric("Taxas (R$)", f"R$ {taxas_valor:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
+        f3.metric("Receita líquida", f"R$ {receita_liquida:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
+        f4.metric("Lucro líquido", f"R$ {lucro_liquido:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
+
+        # Linha 2: destaque para margens
+        st.markdown(
+            """
+            <div style="
+                margin-top: 10px;
+                padding: 14px 14px;
+                border-radius: 16px;
+                border: 1px solid rgba(255,255,255,0.14);
+                background: rgba(255,255,255,0.04);
+            ">
+            """,
+            unsafe_allow_html=True,
+        )
+
+        m1, m2 = st.columns(2)
+        m1.metric("🔥 Margem bruta", f"{margem_bruta_pct:.1f}%")
+        m2.metric("⭐ Margem líquida", f"{margem_liquida_pct:.1f}%")
+
+        st.markdown("</div>", unsafe_allow_html=True)
 
     except ValueError:
         st.warning("Preço atual inválido para cálculo. Corrija no cadastro de Procedimentos.")
