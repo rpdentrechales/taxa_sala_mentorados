@@ -96,13 +96,11 @@ def inject_brand_css():
         }}
 
         /* ========= INPUTS (SUPER ROBUSTO) ========= */
-        /* Labels */
         .stApp label {{
             color: rgba(255,255,255,0.72) !important;
             font-weight: 650 !important;
         }}
 
-        /* BaseWeb mudou: pode ser base-input / input */
         .stApp div[data-baseweb="base-input"],
         .stApp div[data-baseweb="input"],
         .stApp div[data-baseweb="textarea"] {{
@@ -110,7 +108,6 @@ def inject_brand_css():
             border-radius: 12px !important;
         }}
 
-        /* Camadas internas (às vezes o branco fica aqui) */
         .stApp div[data-baseweb="base-input"] > div,
         .stApp div[data-baseweb="base-input"] > div > div,
         .stApp div[data-baseweb="input"] > div,
@@ -122,7 +119,6 @@ def inject_brand_css():
             border-radius: 12px !important;
         }}
 
-        /* Input/textarea: texto claro e fundo transparente */
         .stApp input,
         .stApp textarea {{
             background: transparent !important;
@@ -133,14 +129,13 @@ def inject_brand_css():
             outline: none !important;
         }}
 
-        /* Placeholder */
         .stApp input::placeholder,
         .stApp textarea::placeholder {{
             color: rgba(255,255,255,0.45) !important;
             -webkit-text-fill-color: rgba(255,255,255,0.45) !important;
         }}
 
-        /* Autofill do Chrome (pinta de branco/amarelo se não tratar) */
+        /* Autofill do Chrome */
         .stApp input:-webkit-autofill,
         .stApp input:-webkit-autofill:hover,
         .stApp input:-webkit-autofill:focus,
@@ -193,6 +188,36 @@ def inject_brand_css():
             filter: brightness(0.98);
         }}
 
+        /* ========= Botões (inclui submit do form) ========= */
+        .stButton>button,
+        [data-testid="stFormSubmitButton"] button {{
+          background: linear-gradient(180deg, #7AA2FF, #5B7CFF) !important;
+          color: #ffffff !important;
+          border-radius: 14px !important;
+          padding: 0.70rem 1.00rem !important;
+          font-weight: 800 !important;
+          border: 0px !important;
+          box-shadow: 0 10px 30px rgba(91,124,255,0.18) !important;
+        }}
+
+        .stButton>button:hover,
+        [data-testid="stFormSubmitButton"] button:hover {{
+          filter: brightness(1.05) !important;
+          transform: translateY(-1px) !important;
+        }}
+
+        .stButton>button:active,
+        [data-testid="stFormSubmitButton"] button:active {{
+          transform: translateY(0px) !important;
+          filter: brightness(0.98) !important;
+        }}
+
+        .stButton>button:focus-visible,
+        [data-testid="stFormSubmitButton"] button:focus-visible {{
+          outline: 2px solid rgba(122,162,255,0.55) !important;
+          outline-offset: 2px !important;
+        }}
+
         /* ========= Separador ========= */
         hr {{
             border: none;
@@ -208,6 +233,7 @@ def inject_brand_css():
         """,
         unsafe_allow_html=True,
     )
+
 
 def sidebar_common(key_prefix: str):
     inject_brand_css()
