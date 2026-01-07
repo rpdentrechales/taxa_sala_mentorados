@@ -3,21 +3,31 @@ from pathlib import Path
 
 # Paleta dark premium
 BRAND = {
-    "bg": "#0B1220",          # fundo
-    "panel": "#0F1A2E",       # sidebar / painéis
-    "card": "#101E36",        # cards/metrics
+    "bg": "#0B1220",
+    "panel": "#0F1A2E",
+    "card": "#101E36",
     "border": "rgba(255,255,255,0.10)",
-    "text": "rgba(255,255,255,0.88)",
-    "muted": "rgba(255,255,255,0.65)",
-    "primary": "#5B7CFF",     # azul “360”
+    "text": "rgba(255,255,255,0.92)",
+    "muted": "rgba(255,255,255,0.70)",
+    "primary": "#5B7CFF",
     "primary2": "#7AA2FF",
 }
 
+
+def _logo_path() -> Path:
+    # ui.py está em app/services/ui.py -> parents[1] = app/
+    return Path(__file__).resolve().parents[1] / "assets" / "logo-360.png"
+
+
 def inject_brand_css():
+    """
+    CSS precisa ser re-injetado em TODO rerun (não use flag em session_state),
+    senão "pisca" / muda tema ao clicar.
+    """
     st.markdown(
         f"""
         <style>
-        /* ====== Layout ====== */
+        /* ========= Base ========= */
         .stApp {{
             background: {BRAND["bg"]};
             color: {BRAND["text"]};
@@ -36,15 +46,50 @@ def inject_brand_css():
         h1 {{ font-weight: 850; }}
         h2, h3 {{ font-weight: 750; }}
 
+        /* captions / textos secundários */
         .stCaption, [data-testid="stCaptionContainer"] {{
             color: {BRAND["muted"]} !important;
         }}
 
+        /* ========= Sidebar ========= */
         [data-testid="stSidebar"] {{
             background: {BRAND["panel"]};
             border-right: 1px solid {BRAND["border"]};
         }}
 
+        /* ========= Sidebar NAV (st.navigation) ========= */
+        [data-testid="stSidebarNav"] {{
+            padding-top: 0.5rem;
+        }}
+
+        /* Links do menu */
+        [data-testid="stSidebarNav"] a {{
+            color: {BRAND["text"]} !important;
+            border-radius: 12px;
+            margin: 6px 0;
+            padding: 10px 12px;
+            text-decoration: none !important;
+        }}
+
+        /* Texto dentro do link */
+        [data-testid="stSidebarNav"] a span {{
+            color: {BRAND["text"]} !important;
+            font-weight: 700;
+            opacity: 0.95;
+        }}
+
+        /* Hover */
+        [data-testid="stSidebarNav"] a:hover {{
+            background: rgba(255,255,255,0.06) !important;
+        }}
+
+        /* Página ativa (quando houver aria-current) */
+        [data-testid="stSidebarNav"] a[aria-current="page"] {{
+            background: rgba(91,124,255,0.20) !important;
+            border: 1px solid rgba(91,124,255,0.35) !important;
+        }}
+
+        /* ========= Cards / Metrics ========= */
         [data-testid="stMetric"] {{
             background: {BRAND["card"]};
             border: 1px solid {BRAND["border"]};
@@ -55,20 +100,56 @@ def inject_brand_css():
             color: {BRAND["text"]} !important;
         }}
 
-        input, textarea, .stTextInput input, .stNumberInput input {{
+        /* ========= Inputs (sem global) ========= */
+        /* Labels */
+        [data-testid="stNumberInput"] label,
+        [data-testid="stTextInput"] label,
+        [data-testid="stTextArea"] label,
+        [data-testid="stSelectbox"] label,
+        [data-testid="stMultiSelect"] label {{
+            color: {BRAND["muted"]} !important;
+            font-weight: 650;
+        }}
+
+        /* Campo de texto e número */
+        [data-testid="stNumberInput"] input,
+        [data-testid="stTextInput"] input,
+        [data-testid="stTextArea"] textarea {{
             background: rgba(255,255,255,0.06) !important;
             border: 1px solid {BRAND["border"]} !important;
             color: {BRAND["text"]} !important;
             border-radius: 12px !important;
         }}
 
+        /* Placeholder */
+        [data-testid="stNumberInput"] input::placeholder,
+        [data-testid="stTextInput"] input::placeholder,
+        [data-testid="stTextArea"] textarea::placeholder {{
+            color: rgba(255,255,255,0.45) !important;
+        }}
+
+        /* Botões +/- do number input */
+        [data-testid="stNumberInput"] button {{
+            background: rgba(255,255,255,0.06) !important;
+            border: 1px solid {BRAND["border"]} !important;
+            border-radius: 10px !important;
+        }}
+        [data-testid="stNumberInput"] button * {{
+            color: {BRAND["text"]} !important;
+        }}
+
+        /* Selectbox baseweb */
         [data-baseweb="select"] > div {{
             background: rgba(255,255,255,0.06) !important;
             border: 1px solid {BRAND["border"]} !important;
             border-radius: 12px !important;
             color: {BRAND["text"]} !important;
         }}
+        [data-baseweb="select"] * {{
+            color: {BRAND["text"]} !important;
+        }}
 
+        /* ========= Botões (CTA) ========= */
         .stButton>button {{
             background: linear-gradient(180deg, {BRAND["primary2"]}, {BRAND["primary"]});
             color: white !important;
@@ -87,19 +168,14 @@ def inject_brand_css():
             filter: brightness(0.98);
         }}
 
-        a {{
-            color: {BRAND["primary2"]} !important;
-            font-weight: 650;
-            text-decoration: none;
-        }}
-        a:hover {{ text-decoration: underline; }}
-
+        /* ========= Separador ========= */
         hr {{
             border: none;
             border-top: 1px solid {BRAND["border"]};
             margin: 1.25rem 0;
         }}
 
+        /* ========= Remove menu/toolbar (opcional) ========= */
         #MainMenu {{ visibility: hidden; }}
         header {{ visibility: hidden; }}
         footer {{ visibility: hidden; }}
@@ -109,27 +185,13 @@ def inject_brand_css():
     )
 
 
-def _logo_path() -> Path:
-    """
-    Retorna o caminho absoluto para app/assets/logo-360.png
-    Funciona em local e no Cloud Run (desde que o arquivo esteja no repo).
-    """
-    # ui.py está em app/services/ui.py -> parents[1] = app/
-    return Path(__file__).resolve().parents[1] / "assets" / "logo-360.png"
-
-
 def sidebar_common(key_prefix: str):
-    """Sidebar padrão com identidade visual + logout com key única por página."""
     inject_brand_css()
 
     with st.sidebar:
-        # ✅ Logo
         lp = _logo_path()
         if lp.exists():
             st.image(str(lp), use_container_width=True)
-            st.markdown("")
-        else:
-            # não quebra em prod se não tiver o arquivo
             st.markdown("")
 
         role = st.session_state.get("role", "user")
@@ -158,13 +220,14 @@ def footer_signature():
         <div style="
             width:100%;
             text-align:center;
-            padding: 8px 0 2px 0;
+            padding: 10px 0 2px 0;
             font-size: 0.9rem;
             color: {BRAND["muted"]};
         ">
             <strong style="color:{BRAND["text"]};">Pró-Corpo BI</strong>
             &nbsp;|&nbsp;
-            <strong style="color:{BRAND["text"]};">360 Estética</strong>
+            Desenvolvido por <strong style="color:{BRAND["text"]};">Thales Basilio Santoro</strong>
+            para <strong style="color:{BRAND["text"]};">360 Estética</strong>
         </div>
         """,
         unsafe_allow_html=True,
