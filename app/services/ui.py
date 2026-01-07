@@ -62,7 +62,6 @@ def inject_brand_css():
             padding-top: 0.5rem;
         }}
 
-        /* Links do menu */
         [data-testid="stSidebarNav"] a {{
             color: {BRAND["text"]} !important;
             border-radius: 12px;
@@ -71,19 +70,16 @@ def inject_brand_css():
             text-decoration: none !important;
         }}
 
-        /* Texto dentro do link */
         [data-testid="stSidebarNav"] a span {{
             color: {BRAND["text"]} !important;
             font-weight: 700;
             opacity: 0.95;
         }}
 
-        /* Hover */
         [data-testid="stSidebarNav"] a:hover {{
             background: rgba(255,255,255,0.06) !important;
         }}
 
-        /* Página ativa (quando houver aria-current) */
         [data-testid="stSidebarNav"] a[aria-current="page"] {{
             background: rgba(91,124,255,0.20) !important;
             border: 1px solid rgba(91,124,255,0.35) !important;
@@ -100,7 +96,8 @@ def inject_brand_css():
             color: {BRAND["text"]} !important;
         }}
 
-        /* ========= Inputs (sem global) ========= */
+        /* ========= Inputs (corrigido BaseWeb) ========= */
+
         /* Labels */
         [data-testid="stNumberInput"] label,
         [data-testid="stTextInput"] label,
@@ -111,21 +108,42 @@ def inject_brand_css():
             font-weight: 650;
         }}
 
-        /* Campo de texto e número */
-        [data-testid="stNumberInput"] input,
-        [data-testid="stTextInput"] input,
-        [data-testid="stTextArea"] textarea {{
+        /* Wrapper BaseWeb INPUT (isso estava branco!) */
+        div[data-baseweb="input"] > div {{
             background: rgba(255,255,255,0.06) !important;
             border: 1px solid {BRAND["border"]} !important;
-            color: {BRAND["text"]} !important;
             border-radius: 12px !important;
         }}
 
+        /* Input (texto/numero) */
+        div[data-baseweb="input"] input {{
+            background: transparent !important;
+            color: {BRAND["text"]} !important;
+            -webkit-text-fill-color: {BRAND["text"]} !important;
+            caret-color: {BRAND["text"]} !important;
+        }}
+
         /* Placeholder */
-        [data-testid="stNumberInput"] input::placeholder,
-        [data-testid="stTextInput"] input::placeholder,
-        [data-testid="stTextArea"] textarea::placeholder {{
+        div[data-baseweb="input"] input::placeholder {{
             color: rgba(255,255,255,0.45) !important;
+            -webkit-text-fill-color: rgba(255,255,255,0.45) !important;
+        }}
+
+        /* Wrapper BaseWeb TEXTAREA */
+        div[data-baseweb="textarea"] > div {{
+            background: rgba(255,255,255,0.06) !important;
+            border: 1px solid {BRAND["border"]} !important;
+            border-radius: 12px !important;
+        }}
+        div[data-baseweb="textarea"] textarea {{
+            background: transparent !important;
+            color: {BRAND["text"]} !important;
+            -webkit-text-fill-color: {BRAND["text"]} !important;
+            caret-color: {BRAND["text"]} !important;
+        }}
+        div[data-baseweb="textarea"] textarea::placeholder {{
+            color: rgba(255,255,255,0.45) !important;
+            -webkit-text-fill-color: rgba(255,255,255,0.45) !important;
         }}
 
         /* Botões +/- do number input */
@@ -183,6 +201,7 @@ def inject_brand_css():
         """,
         unsafe_allow_html=True,
     )
+
 
 
 def sidebar_common(key_prefix: str):
