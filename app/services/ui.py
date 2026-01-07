@@ -14,11 +14,6 @@ BRAND = {
 }
 
 def inject_brand_css():
-    """Injecta CSS 1x por sessão para deixar o app com identidade 'dark premium'."""
-    if st.session_state.get("_brand_css_loaded"):
-        return
-    st.session_state["_brand_css_loaded"] = True
-
     st.markdown(
         f"""
         <style>
@@ -34,7 +29,6 @@ def inject_brand_css():
             max-width: 1200px;
         }}
 
-        /* ====== Tipografia ====== */
         h1, h2, h3 {{
             letter-spacing: -0.02em;
             color: {BRAND["text"]};
@@ -42,18 +36,15 @@ def inject_brand_css():
         h1 {{ font-weight: 850; }}
         h2, h3 {{ font-weight: 750; }}
 
-        /* captions / textos secundários */
         .stCaption, [data-testid="stCaptionContainer"] {{
             color: {BRAND["muted"]} !important;
         }}
 
-        /* ====== Sidebar ====== */
         [data-testid="stSidebar"] {{
             background: {BRAND["panel"]};
             border-right: 1px solid {BRAND["border"]};
         }}
 
-        /* ====== Cards / Metrics ====== */
         [data-testid="stMetric"] {{
             background: {BRAND["card"]};
             border: 1px solid {BRAND["border"]};
@@ -64,7 +55,6 @@ def inject_brand_css():
             color: {BRAND["text"]} !important;
         }}
 
-        /* ====== Inputs (geral) ====== */
         input, textarea, .stTextInput input, .stNumberInput input {{
             background: rgba(255,255,255,0.06) !important;
             border: 1px solid {BRAND["border"]} !important;
@@ -72,7 +62,6 @@ def inject_brand_css():
             border-radius: 12px !important;
         }}
 
-        /* Selectbox / multiselect */
         [data-baseweb="select"] > div {{
             background: rgba(255,255,255,0.06) !important;
             border: 1px solid {BRAND["border"]} !important;
@@ -80,7 +69,6 @@ def inject_brand_css():
             color: {BRAND["text"]} !important;
         }}
 
-        /* ====== Botões (CTA) ====== */
         .stButton>button {{
             background: linear-gradient(180deg, {BRAND["primary2"]}, {BRAND["primary"]});
             color: white !important;
@@ -99,7 +87,6 @@ def inject_brand_css():
             filter: brightness(0.98);
         }}
 
-        /* ====== Links ====== */
         a {{
             color: {BRAND["primary2"]} !important;
             font-weight: 650;
@@ -107,18 +94,15 @@ def inject_brand_css():
         }}
         a:hover {{ text-decoration: underline; }}
 
-        /* ====== Separador ====== */
         hr {{
             border: none;
             border-top: 1px solid {BRAND["border"]};
             margin: 1.25rem 0;
         }}
 
-        /* ====== Remove menu/toolbar (opcional) ====== */
         #MainMenu {{ visibility: hidden; }}
         header {{ visibility: hidden; }}
         footer {{ visibility: hidden; }}
-
         </style>
         """,
         unsafe_allow_html=True,
