@@ -96,75 +96,65 @@ def inject_brand_css():
             color: {BRAND["text"]} !important;
         }}
 
-        /* ========= Inputs (corrigido BaseWeb) ========= */
+        /* ========= Inputs (cinza, mais agressivo) ========= */
 
         /* Labels */
-        [data-testid="stNumberInput"] label,
-        [data-testid="stTextInput"] label,
-        [data-testid="stTextArea"] label,
-        [data-testid="stSelectbox"] label,
-        [data-testid="stMultiSelect"] label {{
-            color: {BRAND["muted"]} !important;
-            font-weight: 650;
+        label, .stTextInput label, .stNumberInput label, .stSelectbox label, .stTextArea label {{
+          color: rgba(255,255,255,0.72) !important;
+          font-weight: 650 !important;
         }}
 
-        /* Wrapper BaseWeb INPUT (isso estava branco!) */
-        div[data-baseweb="input"] > div {{
-            background: rgba(255,255,255,0.06) !important;
-            border: 1px solid {BRAND["border"]} !important;
-            border-radius: 12px !important;
-        }}
-
-        /* Input (texto/numero) */
-        div[data-baseweb="input"] input {{
-            background: transparent !important;
-            color: {BRAND["text"]} !important;
-            -webkit-text-fill-color: {BRAND["text"]} !important;
-            caret-color: {BRAND["text"]} !important;
+        /* Campo base (pega a maioria dos casos) */
+        .stApp input,
+        .stApp textarea {{
+          background-color: rgba(255,255,255,0.10) !important;   /* cinza */
+          color: rgba(255,255,255,0.92) !important;
+          -webkit-text-fill-color: rgba(255,255,255,0.92) !important;
+          border: 1px solid rgba(255,255,255,0.14) !important;
+          border-radius: 12px !important;
         }}
 
         /* Placeholder */
-        div[data-baseweb="input"] input::placeholder {{
-            color: rgba(255,255,255,0.45) !important;
-            -webkit-text-fill-color: rgba(255,255,255,0.45) !important;
+        .stApp input::placeholder,
+        .stApp textarea::placeholder {{
+          color: rgba(255,255,255,0.45) !important;
+          -webkit-text-fill-color: rgba(255,255,255,0.45) !important;
         }}
 
-        /* Wrapper BaseWeb TEXTAREA */
-        div[data-baseweb="textarea"] > div {{
-            background: rgba(255,255,255,0.06) !important;
-            border: 1px solid {BRAND["border"]} !important;
-            border-radius: 12px !important;
+        /* Wrapper comum do Streamlit/BaseWeb (quando existir) */
+        .stApp div[data-baseweb="input"] > div,
+        .stApp div[data-baseweb="textarea"] > div {{
+          background-color: rgba(255,255,255,0.10) !important;   /* cinza */
+          border: 1px solid rgba(255,255,255,0.14) !important;
+          border-radius: 12px !important;
         }}
-        div[data-baseweb="textarea"] textarea {{
-            background: transparent !important;
-            color: {BRAND["text"]} !important;
-            -webkit-text-fill-color: {BRAND["text"]} !important;
-            caret-color: {BRAND["text"]} !important;
-        }}
-        div[data-baseweb="textarea"] textarea::placeholder {{
-            color: rgba(255,255,255,0.45) !important;
-            -webkit-text-fill-color: rgba(255,255,255,0.45) !important;
+
+        /* Força input “por cima” do wrapper */
+        .stApp div[data-baseweb="input"] input,
+        .stApp div[data-baseweb="textarea"] textarea {{
+          background: transparent !important;
+          color: rgba(255,255,255,0.92) !important;
+          -webkit-text-fill-color: rgba(255,255,255,0.92) !important;
         }}
 
         /* Botões +/- do number input */
-        [data-testid="stNumberInput"] button {{
-            background: rgba(255,255,255,0.06) !important;
-            border: 1px solid {BRAND["border"]} !important;
-            border-radius: 10px !important;
+        .stApp [data-testid="stNumberInput"] button {{
+          background: rgba(255,255,255,0.10) !important;
+          border: 1px solid rgba(255,255,255,0.14) !important;
+          border-radius: 10px !important;
         }}
-        [data-testid="stNumberInput"] button * {{
-            color: {BRAND["text"]} !important;
+        .stApp [data-testid="stNumberInput"] button * {{
+          color: rgba(255,255,255,0.92) !important;
         }}
 
-        /* Selectbox baseweb */
-        [data-baseweb="select"] > div {{
-            background: rgba(255,255,255,0.06) !important;
-            border: 1px solid {BRAND["border"]} !important;
-            border-radius: 12px !important;
-            color: {BRAND["text"]} !important;
+        /* Selectbox (BaseWeb) */
+        .stApp [data-baseweb="select"] > div {{
+          background: rgba(255,255,255,0.10) !important;
+          border: 1px solid rgba(255,255,255,0.14) !important;
+          border-radius: 12px !important;
         }}
-        [data-baseweb="select"] * {{
-            color: {BRAND["text"]} !important;
+        .stApp [data-baseweb="select"] * {{
+          color: rgba(255,255,255,0.92) !important;
         }}
 
         /* ========= Botões (CTA) ========= */
@@ -201,7 +191,6 @@ def inject_brand_css():
         """,
         unsafe_allow_html=True,
     )
-
 
 
 def sidebar_common(key_prefix: str):
