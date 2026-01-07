@@ -46,7 +46,6 @@ def inject_brand_css():
         h1 {{ font-weight: 850; }}
         h2, h3 {{ font-weight: 750; }}
 
-        /* captions / textos secundários */
         .stCaption, [data-testid="stCaptionContainer"] {{
             color: {BRAND["muted"]} !important;
         }}
@@ -96,65 +95,83 @@ def inject_brand_css():
             color: {BRAND["text"]} !important;
         }}
 
-        /* ========= Inputs (cinza, mais agressivo) ========= */
-
+        /* ========= INPUTS (SUPER ROBUSTO) ========= */
         /* Labels */
-        label, .stTextInput label, .stNumberInput label, .stSelectbox label, .stTextArea label {{
-          color: rgba(255,255,255,0.72) !important;
-          font-weight: 650 !important;
+        .stApp label {{
+            color: rgba(255,255,255,0.72) !important;
+            font-weight: 650 !important;
         }}
 
-        /* Campo base (pega a maioria dos casos) */
+        /* BaseWeb mudou: pode ser base-input / input */
+        .stApp div[data-baseweb="base-input"],
+        .stApp div[data-baseweb="input"],
+        .stApp div[data-baseweb="textarea"] {{
+            background: rgba(255,255,255,0.10) !important;
+            border-radius: 12px !important;
+        }}
+
+        /* Camadas internas (às vezes o branco fica aqui) */
+        .stApp div[data-baseweb="base-input"] > div,
+        .stApp div[data-baseweb="base-input"] > div > div,
+        .stApp div[data-baseweb="input"] > div,
+        .stApp div[data-baseweb="input"] > div > div,
+        .stApp div[data-baseweb="textarea"] > div,
+        .stApp div[data-baseweb="textarea"] > div > div {{
+            background: rgba(255,255,255,0.10) !important;
+            border: 1px solid rgba(255,255,255,0.14) !important;
+            border-radius: 12px !important;
+        }}
+
+        /* Input/textarea: texto claro e fundo transparente */
         .stApp input,
         .stApp textarea {{
-          background-color: rgba(255,255,255,0.10) !important;   /* cinza */
-          color: rgba(255,255,255,0.92) !important;
-          -webkit-text-fill-color: rgba(255,255,255,0.92) !important;
-          border: 1px solid rgba(255,255,255,0.14) !important;
-          border-radius: 12px !important;
+            background: transparent !important;
+            color: rgba(255,255,255,0.92) !important;
+            -webkit-text-fill-color: rgba(255,255,255,0.92) !important;
+            caret-color: rgba(255,255,255,0.92) !important;
+            border: none !important;
+            outline: none !important;
         }}
 
         /* Placeholder */
         .stApp input::placeholder,
         .stApp textarea::placeholder {{
-          color: rgba(255,255,255,0.45) !important;
-          -webkit-text-fill-color: rgba(255,255,255,0.45) !important;
+            color: rgba(255,255,255,0.45) !important;
+            -webkit-text-fill-color: rgba(255,255,255,0.45) !important;
         }}
 
-        /* Wrapper comum do Streamlit/BaseWeb (quando existir) */
-        .stApp div[data-baseweb="input"] > div,
-        .stApp div[data-baseweb="textarea"] > div {{
-          background-color: rgba(255,255,255,0.10) !important;   /* cinza */
-          border: 1px solid rgba(255,255,255,0.14) !important;
-          border-radius: 12px !important;
-        }}
-
-        /* Força input “por cima” do wrapper */
-        .stApp div[data-baseweb="input"] input,
-        .stApp div[data-baseweb="textarea"] textarea {{
-          background: transparent !important;
-          color: rgba(255,255,255,0.92) !important;
-          -webkit-text-fill-color: rgba(255,255,255,0.92) !important;
+        /* Autofill do Chrome (pinta de branco/amarelo se não tratar) */
+        .stApp input:-webkit-autofill,
+        .stApp input:-webkit-autofill:hover,
+        .stApp input:-webkit-autofill:focus,
+        .stApp textarea:-webkit-autofill,
+        .stApp textarea:-webkit-autofill:hover,
+        .stApp textarea:-webkit-autofill:focus {{
+            -webkit-text-fill-color: rgba(255,255,255,0.92) !important;
+            transition: background-color 9999s ease-in-out 0s !important;
+            box-shadow: 0 0 0px 1000px rgba(255,255,255,0.10) inset !important;
+            border-radius: 12px !important;
         }}
 
         /* Botões +/- do number input */
         .stApp [data-testid="stNumberInput"] button {{
-          background: rgba(255,255,255,0.10) !important;
-          border: 1px solid rgba(255,255,255,0.14) !important;
-          border-radius: 10px !important;
+            background: rgba(255,255,255,0.10) !important;
+            border: 1px solid rgba(255,255,255,0.14) !important;
+            border-radius: 10px !important;
         }}
         .stApp [data-testid="stNumberInput"] button * {{
-          color: rgba(255,255,255,0.92) !important;
+            color: rgba(255,255,255,0.92) !important;
         }}
 
-        /* Selectbox (BaseWeb) */
-        .stApp [data-baseweb="select"] > div {{
-          background: rgba(255,255,255,0.10) !important;
-          border: 1px solid rgba(255,255,255,0.14) !important;
-          border-radius: 12px !important;
+        /* Selectbox */
+        .stApp [data-baseweb="select"] > div,
+        .stApp [data-baseweb="select"] > div > div {{
+            background: rgba(255,255,255,0.10) !important;
+            border: 1px solid rgba(255,255,255,0.14) !important;
+            border-radius: 12px !important;
         }}
         .stApp [data-baseweb="select"] * {{
-          color: rgba(255,255,255,0.92) !important;
+            color: rgba(255,255,255,0.92) !important;
         }}
 
         /* ========= Botões (CTA) ========= */
@@ -191,7 +208,6 @@ def inject_brand_css():
         """,
         unsafe_allow_html=True,
     )
-
 
 def sidebar_common(key_prefix: str):
     inject_brand_css()
