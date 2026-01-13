@@ -254,12 +254,30 @@ def sidebar_common(key_prefix: str):
         else:
             st.caption("🏷️ Tenant: —")
 
-        st.markdown("")
+        # ✅ Mensagem de boas práticas (fechar aba)
+        st.markdown(
+            f"""
+            <div style="
+                background: rgba(255,255,255,0.06);
+                border: 1px solid {BRAND['border']};
+                border-radius: 14px;
+                padding: 10px 12px;
+                margin: 10px 0 12px 0;
+                color: {BRAND['muted']};
+                font-size: 0.92rem;
+                line-height: 1.35;
+            ">
+                ✅ Ao finalizar, clique em <b>Sair</b> e <b>feche a aba</b> para encerrar a sessão.
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
         if st.button("🚪 Sair", key=f"{key_prefix}_logout"):
             for k in list(st.session_state.keys()):
                 st.session_state.pop(k, None)
             st.rerun()
+
 
 
 def footer_signature():
