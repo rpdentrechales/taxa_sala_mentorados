@@ -276,13 +276,7 @@ def sidebar_common(key_prefix: str):
         if st.button("🚪 Sair", key=f"{key_prefix}_logout"):
             for k in list(st.session_state.keys()):
                 st.session_state.pop(k, None)
-
-            # Redireciona para fora do Cloud Run (fecha a conexão do Streamlit)
-            st.markdown(
-                "<script>window.location.href='https://www.360gestaoparaclinicas.com.br/';</script>",
-                unsafe_allow_html=True
-            )
-            st.stop()
+            st.rerun()
 
 
 
