@@ -75,3 +75,5 @@ if col2.button("Limpar tudo"):
     save_procedures(tenant_id, [])
     st.warning(f"Procedimentos removidos (loja: {tenant_id})")
 
+footer_signature()
+

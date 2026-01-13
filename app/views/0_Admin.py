@@ -207,4 +207,5 @@ for doc in docs:
 
 st.dataframe(rows, use_container_width=True)
 st.caption("Se você preencheu **email** no convite, ele só funciona para aquele email.")
+footer_signature()
 

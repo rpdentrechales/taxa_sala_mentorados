@@ -82,5 +82,3 @@ if st.session_state.get("role") == "admin":
     pages += [st.Page("views/0_Admin.py", title="Admin", icon="🛠️", url_path="admin")]
 
 st.navigation(pages).run()
-
-footer_signature()

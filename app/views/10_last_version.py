@@ -47,3 +47,4 @@ st.markdown(
 )
 
 st.info("Agora navegue pelas páginas no menu lateral 👈")
+footer_signature()

@@ -144,3 +144,5 @@ if "store_params" in st.session_state and "fixed_costs" in st.session_state:
     d.metric("Custo/min (real)", f"R$ {custo_min_real:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
 
     st.caption(f"Custo/min (capacidade): R$ {custo_min_capacidade:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
+
+footer_signature()
