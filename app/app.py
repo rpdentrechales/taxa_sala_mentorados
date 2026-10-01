@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 load_dotenv(override=True)
-from services.ui import sidebar_common, footer_signature
+from services.ui import sidebar_common, footer_signature, inactivity_guard
 
 
 import os
@@ -8,6 +8,9 @@ import streamlit as st
 
 st.set_page_config(page_title="Taxa de Sala 360", page_icon="🧮", layout="wide")
 st.session_state["base_url"] = os.environ.get("APP_BASE_URL", "http://localhost:8501").rstrip("/")
+
+# ✅ Inatividade (2 min) -> página estática; vale para todas as telas, inclusive login
+inactivity_guard()
 
 from services.guard import (
     require_auth_only,

@@ -16,4 +16,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Cloud Run usa a env PORT
-CMD ["bash", "-lc", "streamlit run app/app.py --server.port=$PORT --server.address=0.0.0.0 --server.headless=true"]
+CMD ["bash", "-lc", "streamlit run app/app.py --server.enableStaticServing=true --server.port=$PORT --server.address=0.0.0.0 --server.headless=true"]

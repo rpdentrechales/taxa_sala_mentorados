@@ -14,6 +14,106 @@ BRAND = {
 }
 
 
+# Página estática servida por /app/static/ (precisa de server.enableStaticServing=true).
+# Sair do Streamlit fecha o websocket -> o Cloud Run para de cobrar a instância.
+SESSION_ENDED_URL = "/app/static/sessao-encerrada.html"
+
+IDLE_WARNING_SECONDS = 90   # mostra o aviso
+IDLE_TIMEOUT_SECONDS = 120  # redireciona
+
+
+def inactivity_guard():
+    """
+    Redireciona para a página de sessão encerrada após IDLE_TIMEOUT_SECONDS sem
+    atividade (mouse/teclado/scroll/toque), com aviso em IDLE_WARNING_SECONDS.
+    Chamar em TODO rerun (app.py), inclusive na tela de login.
+    """
+    st.html(
+        f"""
+        <script>
+        (function () {{
+          // roda a cada rerun, mas instala os listeners uma única vez
+          if (window.__idleGuard) return;
+          window.__idleGuard = true;
+
+          const WARN_MS = {IDLE_WARNING_SECONDS * 1000};
+          const LIMIT_MS = {IDLE_TIMEOUT_SECONDS * 1000};
+          const TARGET = "{SESSION_ENDED_URL}";
+          let last = Date.now();
+          let banner = null;
+
+          function hideBanner() {{
+            if (banner) {{ banner.remove(); banner = null; }}
+          }}
+
+          function showBanner(secondsLeft) {{
+            if (!banner) {{
+              banner = document.createElement("div");
+              banner.setAttribute("role", "alert");
+              banner.style.cssText = [
+                "position:fixed", "left:50%", "bottom:24px", "transform:translateX(-50%)",
+                "z-index:999999", "max-width:calc(100% - 32px)",
+                "background:{BRAND['card']}", "border:1px solid rgba(91,124,255,0.35)",
+                "border-radius:16px", "padding:14px 18px",
+                "box-shadow:0 20px 60px rgba(0,0,0,0.45)",
+                "color:{BRAND['text']}", "font-size:0.95rem", "line-height:1.4",
+                "display:flex", "gap:14px", "align-items:center", "flex-wrap:wrap"
+              ].join(";");
+              // Montado via DOM: o st.html descarta scripts com tags HTML dentro de strings
+              const msg = document.createElement("span");
+              const btn = document.createElement("button");
+              btn.type = "button";
+              btn.textContent = "Continuar";
+              btn.style.cssText = [
+                "background:linear-gradient(180deg,{BRAND['primary2']},{BRAND['primary']})",
+                "color:#fff", "border:0", "border-radius:12px", "padding:8px 14px",
+                "font-weight:800", "cursor:pointer"
+              ].join(";");
+              btn.addEventListener("click", activity);
+              banner.append(msg, btn);
+              document.body.appendChild(banner);
+            }}
+            banner.firstChild.textContent =
+              "⏳ Sua sessão será encerrada por inatividade em " + secondsLeft + " s.";
+          }}
+
+          function activity() {{
+            last = Date.now();
+            hideBanner();
+          }}
+
+          ["mousemove", "mousedown", "keydown", "scroll", "wheel", "touchstart"].forEach(function (ev) {{
+            window.addEventListener(ev, activity, {{ passive: true, capture: true }});
+          }});
+
+          function check() {{
+            const idle = Date.now() - last;
+            if (idle >= LIMIT_MS) {{
+              clearInterval(timer);
+              window.location.replace(TARGET);
+            }} else if (idle >= WARN_MS) {{
+              showBanner(Math.ceil((LIMIT_MS - idle) / 1000));
+            }}
+          }}
+
+          const timer = setInterval(check, 1000);
+          // aba em segundo plano: timers são desacelerados; checa ao voltar
+          document.addEventListener("visibilitychange", check);
+        }})();
+        </script>
+        """,
+        unsafe_allow_javascript=True,
+    )
+
+
+def redirect_to_session_ended(reason: str = "inatividade"):
+    st.html(
+        f'<script>window.location.replace("{SESSION_ENDED_URL}?motivo={reason}");</script>',
+        unsafe_allow_javascript=True,
+    )
+    st.stop()
+
+
 def _logo_path() -> Path:
     # ui.py está em app/services/ui.py -> parents[1] = app/
     return Path(__file__).resolve().parents[1] / "assets" / "logo-360.png"
@@ -276,7 +376,9 @@ def sidebar_common(key_prefix: str):
         if st.button("🚪 Sair", key=f"{key_prefix}_logout"):
             for k in list(st.session_state.keys()):
                 st.session_state.pop(k, None)
-            st.rerun()
+
+            # Sai do Streamlit (fecha o websocket) em vez de voltar ao login
+            redirect_to_session_ended("logout")
 
 
 
